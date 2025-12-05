@@ -6,12 +6,33 @@
 
 
 .d4.p1:{
-    :count where .d4.posCheck ./: til[.d4.yLen] cross til .d4.xLen;
+    :count where .d4.posCheck[.d4.data;;] ./: til[.d4.yLen] cross til .d4.xLen;
+ };
+
+.d4.p2:{
+    :first last (.d4.pickPaperRound\) (0; .d4.data);
  };
 
 
-.d4.posCheck:{[y; x]
-    item:.d4.data[y; x];
+.d4.pickPaperRound:{[input]
+    pCount:input 0;
+    map:input 1;
+
+    pos:til[.d4.yLen] cross til .d4.xLen;
+    picked:pos where .d4.posCheck[map;;] ./: pos;
+
+    if[0 = count picked;
+       :input;
+    ];
+
+    / Update map - replace picked with "."
+    newMap:(.[;; :; "."]/)[map; picked];
+    :(pCount + count picked; newMap);
+ };
+
+
+.d4.posCheck:{[map; y; x]
+    item:map[y; x];
 
     if["." = item;
         :0b;
@@ -26,5 +47,5 @@
     neighbours:neighbours except enlist (y;x);
     neighbours:distinct neighbours;
 
-    :4 > count where "@" = .d4.data ./: neighbours;
+    :4 > count where "@" = map ./: neighbours;
  };
